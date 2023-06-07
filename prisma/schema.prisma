@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id          String   @id @db.VarChar(255) @default(uuid())
+  name        String   @db.VarChar(255)
+  cpf         String   @db.VarChar(255) @unique
+  rg          String   @db.VarChar(255) @unique
+  phone       String   @db.VarChar(255)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  client      ClientsOnReservations[]
+}
+
+model Reservation {
+  id            String   @id @db.VarChar(255) @default(uuid())
+  startsAt      DateTime @db.Timestamp(6) @default(now())
+  endsAt        DateTime @db.Timestamp(6) @default(now())
+  carAdditional Boolean  @db.Boolean() @default(false)
+  total         Float    @db.DoublePrecision()
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  reservation   ClientsOnReservations[]
+}
+
+model ClientsOnReservations {
+  id            String   @id @db.VarChar(255) @default(uuid())
+  client        Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  clientId      String?  @db.VarChar(255)
+  reservation   Reservation?  @relation(fields: [reservationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  reservationId String?  @db.VarChar(255)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
